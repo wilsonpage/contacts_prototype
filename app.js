@@ -1,45 +1,43 @@
-var isOriginalUI;
+performance.mark('first script exec');
 
-function loadView(isOriginalUI) {
-  if (isOriginalUI) {
-    document.getElementById('detail-iframe').src = 'view/original-detail/index.html';
-    document.getElementById('list-iframe').src = 'view/original-list/index.html';
-  } else {
-    document.getElementById('detail-iframe').src = 'view/detail/index.html';
-    document.getElementById('list-iframe').src = 'view/list/index.html';
+// window.console.time('first iframe');
+// window.console.time('onload');
+
+performance.measure('domLoading -> first script', 'domLoading', 'first script exec');
+
+addEventListener('message', e => {
+  switch (e.data) {
+    case 'frame1':
+      performance.mark('frame1 message');
+      performance.measure('domLoading -> frame1 message', 'domLoading', 'frame1 message');
+      var iframe = document.createElement('iframe');
+      iframe.src = 'services/contacts.html';
+      iframe.hidden = true;
+      document.body.appendChild(iframe);
+    break;
+    case 'frame2':
+      performance.mark('frame2 message');
+      performance.measure('domLoading -> frame2 message', 'domLoading', 'frame2 message');
+      done();
+    break;
   }
+});
+
+function done() {
+  performance.getEntriesByType('measure').forEach(entry => {
+    var name = entry.name;
+    var previous = Number(localStorage[name + ':total'] || 0);
+    var count = Number(localStorage[name + ':count'] || 0) + 1;
+    var total = previous += entry.duration;
+    var mean = total / count;
+
+    localStorage[name + ':total'] = total;
+    localStorage[name + ':count'] = count;
+
+    console.log('"' + name + '": ', mean + 'ms (mean)');
+  });
 }
 
-
-
-window.onload = function() {
-  var client = threads.client('navigation-service');
-
-  isOriginalUI = Config.originalUI;
-  loadView(isOriginalUI);
-
-  client.method('registerContentWrapper', client.id);
-
-  // Listen about requests of navigation
-  client.on('navigate', function(params) {
-
-    Navigation.go(params.from, params.to, params.effect).then(function() {
-      // TODO Remove me when Navigation will be ready
-      if (params.to !== 'list') {
-        document.querySelector('#change-view-button').style.display = 'none';
-      } else {
-        document.querySelector('#change-view-button').style.display = 'block';
-      }
-      client.method('navigationend');
-    });
-  });
-
-  // Add listeners for 'tap' actions in the list
-  document.querySelector('#change-view-button').addEventListener(
-    'click',
-    function() {
-      isOriginalUI = !isOriginalUI;
-      loadView(isOriginalUI);
-    }
-  );
+function clearStorage() {
+  localStorage.clear();
 }

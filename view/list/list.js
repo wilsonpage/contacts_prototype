@@ -1,38 +1,39 @@
-var contactsService = threads.client('contacts-service');
-var ul;
-// Performance related vars
-var firstContact = true;
-var renderCount = 0;
-var maxRenders = 3;
-// NOTE! Modify this value to retrieve all performance values
-var PERFORMACE_FLAG = false;
+/*jshint esnext:true*/
 
-var perf = window.parent.performance;
+var win = window.parent;
+var perf = win.performance;
+var console = win.console;
 
-perf.mark('list-view ready');
+// win.console.timeEnd('first iframe');
+// win.console.time('second iframe');
+perf.mark('frame1 script');
+// perf.mark('connect start');
+perf.measure('domLoading -> frame1 script', 'domLoading', 'frame1 script');
+
+setTimeout(() => {
+  win.postMessage('frame1', '*');
+});
+
+// var client = threads.client('contacts-service');
+
+
 // perf.measure('list view init', 'domLoading', 'list-view ready');
 
 // function renderContacts(renderCB, onRenderedCB) {
-  var stream = contactsService.stream('getAll');
 
-  contactsService.connected.then(() => {
-    perf.mark('service connected');
-    // perf.measure('service to connect', 'list-view ready', 'service connected');
-  });
+// perf.mark('get-contact');
+// console.time('get contact');
 
-  // Called every time the service sends a contact
-  stream.listen(function(data) {
-    perf.mark('first-contact');
-    var contact = JSON.parse(data.contact);
-    // renderCB(contact, data);
-    // perf.measure('first contact rendered', 'service to connect', 'first-contact');
-  });
+// client.method('get').then(contact => {
+//   perf.mark('get-contact-response');
+//   perf.measure('get contact (request)', 'get-contact', 'get-contact-request');
+//   perf.measure('get contact (response)', 'get-contact-request', 'get-contact-response');
+//   console.timeEnd('get contact');
+//   document.body.textContent = contact.givenName[0];
+// });
 
-  // "closed" is a Promise that will be fullfilled when stream is closed with
-  // success or rejected when the service "abort" the operation
-  stream.closed.then(function onStreamClose() {
-    // onRenderedCB();
-  }, function onStreamAbort() {
-    // onRenderedCB(new Error('Error when rendering'));
-  });
-// }
+// client.connected.then(() => {
+//   perf.mark('connect end');
+//   perf.measure('connect', 'connect start', 'connect end');
+// });
+
