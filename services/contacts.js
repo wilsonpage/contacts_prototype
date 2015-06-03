@@ -3,13 +3,26 @@ var win = window.parent;
 var console = win.console;
 var perf = win.performance;
 
-perf.mark('frame2 script');
+var channel = new BroadcastChannel('mychannel');
 
-perf.measure('domLoading -> frame2 script', 'domLoading', 'frame2 script');
-// perf.measure('frame1 script exec to frame2 script exec', 'frame1 script', 'frame2 script');
-// win.console.timeEnd('second iframe');
+perf.mark('service-script');
+perf.measure('domLoading -> service-script', 'domLoading', 'service-script');
 
-win.postMessage('frame2', '*');
+channel.onmessage = e => {
+  switch (e.data) {
+    case 'ping':
+      perf.mark('got ping');
+      channel.postMessage('pong');
+    break;
+  }
+};
+
+channel.postMessage('serviceready');
+
+onload = function() {
+  perf.mark('service-onload');
+  perf.measure('domLoading -> service-onload', 'domLoading', 'service-onload');
+};
 
 // threads.service('contacts-service')
 //   .method('get', function(uuid) {
