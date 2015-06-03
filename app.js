@@ -19,3 +19,8 @@ channel.onmessage = e => {
 function clearStorage() {
   localStorage.clear();
 }
+
+onload = function() {
+  performance.mark('app-onload');
+  performance.measure('domLoading -> app-onload', 'domLoading', 'app-onload');
+};
