@@ -97,7 +97,7 @@ var ChildThreadPrototype = ChildThread.prototype;
  */
 
 ChildThreadPrototype.createTarget = function() {
-  debug('create process');
+  console.timeStamp('create target');
   switch(this.type) {
     case 'worker': return new Worker(this.src);
     case 'sharedworker': return new SharedWorker(this.src);
@@ -523,7 +523,7 @@ ClientPrototype.connect = function() {
   this.service.channel = new BroadcastChannel(this.id);
   this.service.channel.onmessage = this.messenger.parse;
 
-  win.console.time('connect');
+  console.timeStamp('client-connect');
 
   // If the client has a handle on the
   // thread we can connect to it directly,
@@ -533,6 +533,7 @@ ClientPrototype.connect = function() {
     : this.connectViaManager();
 
   return this.connected.then(function(service) {
+    console.timeStamp('client-connected');
     debug('connected', service);
     self.service.id = service.id;
     thread.connection('outbound');
@@ -1203,6 +1204,7 @@ ManagerPrivatePrototype.onconnect = function(request) {
 
   performance.mark('got-connect');
   performance.measure('domLoading -> got-connect', 'domLoading', 'got-connect');
+  console.timeStamp('manager-got-connect');
 
   var self = this;
   var client = data.client;

@@ -2,6 +2,7 @@
 
 performance.mark('app-script');
 performance.measure('domLoading -> app-script', 'domLoading', 'app-script');
+console.timeStamp('app-script');
 
 function clearStorage() {
   localStorage.clear();
@@ -21,4 +22,5 @@ threads.manager({
 onload = function() {
   performance.mark('app-onload');
   performance.measure('domLoading -> app-onload', 'domLoading', 'app-onload');
+  console.timeStamp('app-onload');
 };

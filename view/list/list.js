@@ -6,18 +6,21 @@ var console = win.console;
 
 perf.mark('view-script');
 perf.measure('domLoading -> view-script', 'domLoading', 'view-script');
+console.timeStamp('view-script');
 
 var client = threads.client('contacts-service');
 
 client.method('ping').then(contact => {
   perf.mark('got-pong');
   perf.measure('domLoading -> got-pong', 'domLoading', 'got-pong');
+  console.timeStamp('got-pong');
   done();
 });
 
 client.connected.then(() => {
-  perf.mark('got-ready');
-  perf.measure('domLoading -> got-ready', 'domLoading', 'got-ready');
+  perf.mark('view-connected');
+  perf.measure('domLoading -> view-connected', 'domLoading', 'view-connected');
+  console.timeStamp('view-connected');
 });
 
 function done() {
@@ -38,4 +41,5 @@ function done() {
 onload = function() {
   perf.mark('view-onload');
   perf.measure('domLoading -> view-onload', 'domLoading', 'view-onload');
+  console.timeStamp('view-onload');
 };
